@@ -22,6 +22,30 @@ var baseURI = 'http://localhost:' + port;
 
 async.waterfall(
     [
+        function (done){
+            var options = Object.assign(
+                {},
+                baseOptions,
+                { url: baseURI+'/people'}
+            )
+            request.body = {
+                name: 'Jason Doe',
+                age: 20,
+                job: 'Consultant',
+                friends:[]
+            };
+            request.post(options,function(err,response,body){
+                var statusCode = response.statusCode;
+                if(err|| statusCode!== 201)
+                    return done(err || new Error('Error: '+ statusCode+ response.body));
+                try {
+                    body = JSON.parse(body);
+                } catch (error) {
+                    return done(null, body);
+                }
+            })  
+        },
+
         function (done) {
             // Options for the request.
             var options = Object.assign(
@@ -36,7 +60,7 @@ async.waterfall(
 
                 // Handle errors
                 if (err || statusCode !== 200)
-                    return done(err || new Error('Error: ' + statusCode));
+                    return done(err || new Error('Error: ' + statusCode + response.body));
 
                 // Parse the response.
                 try {
@@ -80,6 +104,8 @@ async.waterfall(
                 return done(null, body);
             });
         },
+
+        
     ], function (err, person) {
         // Handle any errors from the requests.
         if (err) {

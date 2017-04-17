@@ -133,6 +133,25 @@ app.get('/people/:id', function (request, response, next) {
     return response.json(person);
 });
 
+/**
+ * POST /people/
+ * Recieves a new person to add to the database
+ */
+app.post('/people/', function (request, response, next){
+    try {
+        var person = JSON.parse(request.body);
+        var idArray = database.people.map(function (element) { return element.id; });
+        var newId = Math.max(idArray) + 1;
+        person.id = newId;
+        addPersonToDatabase(person);
+        response.status(201);
+        response.json(person);
+        return response
+    } catch (error) {
+        return response.status(500).send(error.message);
+    }
+});
+
 // Middleware to catch any 404s
 app.use(function (request, response, next) {
     var error404 = new Error('Not Found');
