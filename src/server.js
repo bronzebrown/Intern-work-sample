@@ -39,7 +39,16 @@ var database = {
         }
     }
 };
-
+var lastkey = function(){
+    var keys = Object.keys(database.people);
+    var max = 0
+    for (var index = 0; index < keys.length; index++) {
+        var element = parseInt(keys[index]);
+        if(max<element)
+        max=element;
+    }
+    return max;
+};
 /**
  * Returns true if the argument passed to it is a valid person.
  * Does not require the id field to be present.
@@ -139,9 +148,8 @@ app.get('/people/:id', function (request, response, next) {
  */
 app.post('/people/', function (request, response, next){
     try {
-        var person = JSON.parse(request.body);
-        var idArray = database.people.map(function (element) { return element.id; });
-        var newId = Math.max(idArray) + 1;
+        var person = request.body;
+        var newId = lastkey() + 1;
         person.id = newId;
         addPersonToDatabase(person);
         response.status(201);
